@@ -2,4 +2,4 @@ module github.com/Ouest-France/goldap
 
 go 1.13
 
-require gopkg.in/ldap.v2 v2.5.1
+require github.com/go-ldap/ldap/v3 v3.1.3
