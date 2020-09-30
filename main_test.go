@@ -17,12 +17,19 @@ func NewClientHelper() (Client, error) {
 		return Client{}, err
 	}
 
+	tlsInsecure, err := strconv.ParseBool(os.Getenv("GOLDAP_TLS_INSECURE"))
+	if err != nil {
+		return Client{}, err
+	}
+
 	client := Client{
 		Host:         os.Getenv("GOLDAP_HOST"),
 		Port:         port,
 		BindUser:     os.Getenv("GOLDAP_BINDUSER"),
 		BindPassword: os.Getenv("GOLDAP_BINDPASSWORD"),
 		TLS:          tls,
+		TLSCACert:    os.Getenv("GOLDAP_TLS_CA_CERT"),
+		TLSInsecure:  tlsInsecure,
 	}
 
 	err = client.Connect()

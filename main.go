@@ -1,6 +1,8 @@
 package goldap
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
 
 	"github.com/go-ldap/ldap/v3"
@@ -14,22 +16,52 @@ type Client struct {
 	BindUser     string
 	BindPassword string
 	TLS          bool
+	TLSCACert    string
+	TLSInsecure  bool
 }
 
+// Connect Creates un ldap connection
 func (c *Client) Connect() error {
-
+	var ldapConn *ldap.Conn
 	uri := fmt.Sprintf("%s:%d", c.Host, c.Port)
 
-	l, err := ldap.Dial("tcp", uri)
-	if err != nil {
-		return fmt.Errorf("error dialing: %s", err)
+	if c.TLS {
+		// Get the System Cert Pool
+		caCertPool, err := x509.SystemCertPool()
+		if err != nil {
+			return fmt.Errorf("error tls: %s", err)
+		}
+
+		// Use the provided CA certificate
+		if c.TLSCACert != "" {
+			caCertPool = x509.NewCertPool()
+			if ok := caCertPool.AppendCertsFromPEM([]byte(c.TLSCACert)); !ok {
+				return fmt.Errorf("error tls: Can't add the CA certificate to certificate pool")
+			}
+		}
+
+		conn, err := ldap.DialTLS("tcp", uri, &tls.Config{
+			RootCAs:            caCertPool,
+			InsecureSkipVerify: c.TLSInsecure,
+		})
+		if err != nil {
+			return fmt.Errorf("error dialing: %s", err)
+		}
+		ldapConn = conn
+
+	} else {
+		conn, err := ldap.Dial("tcp", uri)
+		if err != nil {
+			return fmt.Errorf("error dialing: %s", err)
+		}
+		ldapConn = conn
 	}
 
-	err = l.Bind(c.BindUser, c.BindPassword)
+	err := ldapConn.Bind(c.BindUser, c.BindPassword)
 	if err != nil {
 		return fmt.Errorf("error binding: %s", err)
 	}
-	c.Conn = l
+	c.Conn = ldapConn
 
 	return nil
 }
