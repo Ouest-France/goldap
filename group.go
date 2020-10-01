@@ -4,11 +4,16 @@ import (
 	"github.com/go-ldap/ldap/v3"
 )
 
-func (c *Client) CreateGroup(dn, name string, members []string) error {
+// CreateGroup creates ldap group
+func (c *Client) CreateGroup(dn, name string, description string, members []string) error {
 
 	req := ldap.NewAddRequest(dn, []ldap.Control{})
 	req.Attribute("objectClass", []string{"group"})
 	req.Attribute("sAMAccountName", []string{name})
+
+	if description != "" {
+		req.Attribute("description", []string{description})
+	}
 
 	if len(members) > 0 {
 		req.Attribute("member", members)
@@ -17,6 +22,7 @@ func (c *Client) CreateGroup(dn, name string, members []string) error {
 	return c.Conn.Add(req)
 }
 
+// ReadGroup reads ldap group and return it's attributes on an error if the group donesn't exist
 func (c *Client) ReadGroup(dn string) (attributes map[string][]string, err error) {
 
 	req := ldap.NewSearchRequest(
@@ -46,6 +52,7 @@ func (c *Client) ReadGroup(dn string) (attributes map[string][]string, err error
 	return attributes, nil
 }
 
+// DeleteGroup deletes the specify group
 func (c *Client) DeleteGroup(dn string) error {
 
 	req := ldap.NewDelRequest(dn, []ldap.Control{})
