@@ -22,7 +22,6 @@ type Client struct {
 
 // Connect Creates un ldap connection
 func (c *Client) Connect() error {
-	var ldapConn *ldap.Conn
 	uri := fmt.Sprintf("%s:%d", c.Host, c.Port)
 
 	if c.TLS {
@@ -47,21 +46,20 @@ func (c *Client) Connect() error {
 		if err != nil {
 			return fmt.Errorf("error dialing: %s", err)
 		}
-		ldapConn = conn
+		c.Conn = conn
 
 	} else {
 		conn, err := ldap.Dial("tcp", uri)
 		if err != nil {
 			return fmt.Errorf("error dialing: %s", err)
 		}
-		ldapConn = conn
+		c.Conn = conn
 	}
 
-	err := ldapConn.Bind(c.BindUser, c.BindPassword)
+	err := c.Conn.Bind(c.BindUser, c.BindPassword)
 	if err != nil {
 		return fmt.Errorf("error binding: %s", err)
 	}
-	c.Conn = ldapConn
 
 	return nil
 }
