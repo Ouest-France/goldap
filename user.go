@@ -2,27 +2,28 @@ package goldap
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/go-ldap/ldap/v3"
 )
 
 // ReadUser reads ldap user and return it's attributes on an error if the user donesn't exist
 func (c *Client) ReadUser(ou string, name string, sAMAccountName string, upn string) (entries map[string][]string, err error) {
-	filter := ""
+	conditions := []string{"(objectCategory=person)", "(objectClass=user)"}
 
 	if name != "" {
-		filter = fmt.Sprintf("%s(name=%s)", filter, name)
+		conditions = append(conditions, fmt.Sprintf("(name=%s)", name))
 	}
 
 	if sAMAccountName != "" {
-		filter = fmt.Sprintf("%s(sAMAccountName=%s)", filter, sAMAccountName)
+		conditions = append(conditions, fmt.Sprintf("(sAMAccountName=%s)", sAMAccountName))
 	}
 
 	if upn != "" {
-		filter = fmt.Sprintf("%s(userPrincipalName=%s)", filter, upn)
+		conditions = append(conditions, fmt.Sprintf("(userPrincipalName=%s)", upn))
 	}
 
-	filter = fmt.Sprintf("(&(objectCategory=person)(objectClass=user)%s)", filter)
+	filter := fmt.Sprintf("(&%s)", strings.Join(conditions, ""))
 
 	req := ldap.NewSearchRequest(
 		ou,
