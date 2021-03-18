@@ -29,7 +29,22 @@ func TestUpdateGroupMembers(t *testing.T) {
 		t.FailNow()
 	}
 
-	err = client.UpdateGroup(os.Getenv("GOLDAP_TESTGROUP"), os.Getenv("GOLDAP_TESTNAME"), os.Getenv("GOLDAP_TESTDESC"), []string{os.Getenv("GOLDAP_TESTMEMBER")})
+	err = client.UpdateGroupMembers(os.Getenv("GOLDAP_TESTGROUP"), []string{os.Getenv("GOLDAP_TESTMEMBER")})
+	if err != nil {
+		fmt.Printf("%s", err)
+		t.FailNow()
+	}
+}
+
+func TestUpdateGroupDescription(t *testing.T) {
+
+	client, err := NewClientHelper()
+	if err != nil {
+		fmt.Printf("%s", err)
+		t.FailNow()
+	}
+
+	err = client.UpdateGroupDescription(os.Getenv("GOLDAP_TESTGROUP"), os.Getenv("GOLDAP_TESTDESCNEW"))
 	if err != nil {
 		fmt.Printf("%s", err)
 		t.FailNow()
