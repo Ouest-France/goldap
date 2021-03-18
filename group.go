@@ -52,8 +52,8 @@ func (c *Client) ReadGroup(dn string) (attributes map[string][]string, err error
 	return attributes, nil
 }
 
-// UpdateGroup updates ldap group description
-func (c *Client) UpdateGroup(dn, name string, description string, members []string) error {
+// UpdateGroupDescription updates ldap group description
+func (c *Client) UpdateGroupDescription(dn string, description string) error {
 
 	req := ldap.NewModifyRequest(dn, []ldap.Control{})
 
@@ -62,6 +62,14 @@ func (c *Client) UpdateGroup(dn, name string, description string, members []stri
 	} else {
 		req.Replace("description", []string{description})
 	}
+
+	return c.Conn.Modify(req)
+}
+
+// UpdateGroupMembers updates ldap group members
+func (c *Client) UpdateGroupMembers(dn string, members []string) error {
+
+	req := ldap.NewModifyRequest(dn, []ldap.Control{})
 
 	if len(members) == 0 {
 		req.Delete("member", members)
