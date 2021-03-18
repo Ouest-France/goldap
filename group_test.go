@@ -21,6 +21,21 @@ func TestCreateGroup(t *testing.T) {
 	}
 }
 
+func TestUpdateGroupMembers(t *testing.T) {
+
+	client, err := NewClientHelper()
+	if err != nil {
+		fmt.Printf("%s", err)
+		t.FailNow()
+	}
+
+	err = client.UpdateGroup(os.Getenv("GOLDAP_TESTGROUP"), os.Getenv("GOLDAP_TESTNAME"), os.Getenv("GOLDAP_TESTDESC"), []string{os.Getenv("GOLDAP_TESTMEMBER")})
+	if err != nil {
+		fmt.Printf("%s", err)
+		t.FailNow()
+	}
+}
+
 func TestReadGroup(t *testing.T) {
 
 	client, err := NewClientHelper()
