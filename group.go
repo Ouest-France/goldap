@@ -80,6 +80,16 @@ func (c *Client) UpdateGroupMembers(dn string, members []string) error {
 	return c.Conn.Modify(req)
 }
 
+// UpdateGroupType updates ldap group type
+func (c *Client) UpdateGroupType(dn string, groupType string) error {
+
+	req := ldap.NewModifyRequest(dn, []ldap.Control{})
+
+	req.Replace("groupType", []string{groupType})
+
+	return c.Conn.Modify(req)
+}
+
 // DeleteGroup deletes the specify group
 func (c *Client) DeleteGroup(dn string) error {
 
