@@ -51,6 +51,21 @@ func TestUpdateGroupDescription(t *testing.T) {
 	}
 }
 
+func TestUpdateGroupType(t *testing.T) {
+
+	client, err := NewClientHelper()
+	if err != nil {
+		fmt.Printf("%s", err)
+		t.FailNow()
+	}
+
+	err = client.UpdateGroupType(os.Getenv("GOLDAP_TESTGROUP"), "-2147483640")
+	if err != nil {
+		fmt.Printf("%s", err)
+		t.FailNow()
+	}
+}
+
 func TestReadGroup(t *testing.T) {
 
 	client, err := NewClientHelper()
