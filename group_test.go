@@ -74,7 +74,7 @@ func TestReadGroup(t *testing.T) {
 		t.FailNow()
 	}
 
-	_, err = client.ReadGroup(os.Getenv("GOLDAP_TESTGROUP"))
+	_, err = client.ReadGroup(os.Getenv("GOLDAP_TESTGROUP"), 1500)
 	if err != nil {
 		fmt.Printf("fail: %s", err)
 		t.FailNow()
@@ -89,7 +89,7 @@ func TestDeleteGroup(t *testing.T) {
 		t.FailNow()
 	}
 
-	_, err = client.ReadGroup(os.Getenv("GOLDAP_TESTGROUP"))
+	_, err = client.ReadGroup(os.Getenv("GOLDAP_TESTGROUP"), 10)
 	if err != nil {
 		fmt.Printf("fail: %s", err)
 		t.FailNow()
