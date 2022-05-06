@@ -8,7 +8,7 @@ import (
 	"github.com/go-ldap/ldap/v3"
 )
 
-// Client represents an LDAP client instance
+// Client represents a LDAP client instance
 type Client struct {
 	Conn         *ldap.Conn
 	Host         string
@@ -20,7 +20,7 @@ type Client struct {
 	TLSInsecure  bool
 }
 
-// Connect Creates un ldap connection
+// Connect creates a ldap connection
 func (c *Client) Connect() error {
 	uri := fmt.Sprintf("%s:%d", c.Host, c.Port)
 
@@ -49,7 +49,7 @@ func (c *Client) Connect() error {
 		c.Conn = conn
 
 	} else {
-		conn, err := ldap.Dial("tcp", uri)
+		conn, err := ldap.DialURL(uri)
 		if err != nil {
 			return fmt.Errorf("error dialing: %s", err)
 		}

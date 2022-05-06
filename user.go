@@ -47,7 +47,7 @@ func (c *Client) ReadUser(ou string, name string, sAMAccountName string, upn str
 	}
 
 	if len(sr.Entries) > 1 {
-		return nil, ldap.NewError(ldap.LDAPResultOther, fmt.Errorf("The filter '%s' match more than one user in the OU: %s", filter, ou))
+		return nil, ldap.NewError(ldap.LDAPResultOther, fmt.Errorf("the filter '%s' match more than one user in the OU: %s", filter, ou))
 	}
 
 	entries = map[string][]string{}

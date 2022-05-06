@@ -24,87 +24,34 @@ func (c *Client) CreateGroup(dn, name string, description string, members []stri
 	return c.Conn.Add(req)
 }
 
-// ReadGroup reads ldap group and return it's attributes on an error if the group donesn't exist
-func (c *Client) ReadGroup(dn string, memberPageSize int) (attributes map[string][]string, err error) {
+// ReadGroup searchs for a ldap group and returns a map of its attributes. If not found, an empty map
+func (c *Client) ReadGroup(baseDn string, groupName string, memberPageSize int) (attributes map[string][]string, err error) {
 
-	// Request name and description attributes
+	var pageSize uint32 = 32
+	pagingControl := ldap.NewControlPaging(pageSize)
+	// Create request to search for group attributes
 	req := ldap.NewSearchRequest(
-		dn,
-		ldap.ScopeBaseObject,
-		ldap.NeverDerefAliases,
-		0,
-		0,
+		baseDn,
+		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0,
 		false,
-		"(objectclass=group)",
-		[]string{"name", "description"},
-		[]ldap.Control{},
+		fmt.Sprintf("(&(objectClass=group)(cn=%s))", groupName),
+		[]string{},
+		[]ldap.Control{pagingControl},
 	)
 
+	// Search group
 	sr, err := c.Conn.Search(req)
 	if err != nil {
 		return attributes, err
 	}
 
+	// Fills attribute map with entry key/values
 	attributes = map[string][]string{}
 	for _, entry := range sr.Entries {
 		for _, attr := range entry.Attributes {
-
 			attributes[attr.Name] = attr.Values
 		}
 	}
-
-	// Page member attribute
-	page := 0
-	attributes["member"] = []string{}
-	for {
-		fmt.Printf("member;range=%d-%d\n", memberPageSize*page, (memberPageSize-1)+memberPageSize*page)
-
-		// Request member attribute page
-		req := ldap.NewSearchRequest(
-			dn,
-			ldap.ScopeBaseObject,
-			ldap.NeverDerefAliases,
-			0,
-			0,
-			false,
-			"(objectclass=group)",
-			[]string{fmt.Sprintf("member;range=%d-%d", memberPageSize*page, (memberPageSize-1)+memberPageSize*page)},
-			[]ldap.Control{},
-		)
-
-		// Search
-		sr, err := c.Conn.Search(req)
-		if err != nil {
-			return attributes, err
-		}
-
-		// If no attributes found, member doesn't exists, break
-		if len(sr.Entries) == 0 {
-			break
-		}
-
-		// If more than one entry, it's an error
-		if len(sr.Entries) > 1 {
-			return attributes, fmt.Errorf("more than one entry found retrieving group members")
-		}
-
-		// If no attributes found, member doesn't exists, break
-		if len(sr.Entries[0].Attributes) == 0 {
-			break
-		}
-
-		// Append member attribute
-		attributes["member"] = append(attributes["member"], sr.Entries[0].Attributes[0].Values...)
-
-		// If no more pages, break
-		if len(sr.Entries[0].Attributes[0].Values) < memberPageSize {
-			break
-		}
-
-		// Next page
-		page++
-	}
-
 	return attributes, nil
 }
 
