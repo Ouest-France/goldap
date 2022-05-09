@@ -81,6 +81,21 @@ func TestReadGroup(t *testing.T) {
 	}
 }
 
+func TestSearchGroupByName(t *testing.T) {
+
+	client, err := NewClientHelper()
+	if err != nil {
+		fmt.Printf("%s", err)
+		t.FailNow()
+	}
+
+	_, err = client.SearchGroupByName(os.Getenv("GOLDAP_TESTSEARCHGROUP"), os.Getenv("GOLDAP_TESTSEARCHOU"), 2)
+	if err != nil {
+		fmt.Printf("fail: %s", err)
+		t.FailNow()
+	}
+}
+
 func TestDeleteGroup(t *testing.T) {
 
 	client, err := NewClientHelper()
