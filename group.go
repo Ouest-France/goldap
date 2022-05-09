@@ -24,6 +24,42 @@ func (c *Client) CreateGroup(dn, name string, description string, members []stri
 	return c.Conn.Add(req)
 }
 
+// SearchGroupByName searches an LDAP group by name and returns its DN
+func (c *Client) SearchGroupByName(name, ou string, scope int) (string, error) {
+
+	// Request name and description attributes
+	req := ldap.NewSearchRequest(
+		ou,
+		scope,
+		ldap.NeverDerefAliases,
+		0,
+		0,
+		false,
+		fmt.Sprintf("(&(objectClass=group)(cn=%s))", name),
+		[]string{},
+		[]ldap.Control{},
+	)
+
+	// Search for group
+	sr, err := c.Conn.Search(req)
+	if err != nil {
+		return "", fmt.Errorf("searching group by name: %s", err)
+	}
+
+	// If no entries found, group doesn't exists, return error
+	if len(sr.Entries) == 0 {
+		return "", fmt.Errorf("group %q not found in OU %q", name, ou)
+	}
+
+	// If more than one entry, it's an error
+	if len(sr.Entries) > 1 {
+		return "", fmt.Errorf("more than one group found with name %q in OU %q", name, ou)
+	}
+
+	// Return group DN
+	return sr.Entries[0].DN, nil
+}
+
 // ReadGroup reads ldap group and return it's attributes on an error if the group donesn't exist
 func (c *Client) ReadGroup(dn string, memberPageSize int) (attributes map[string][]string, err error) {
 
