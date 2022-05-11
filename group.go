@@ -72,7 +72,7 @@ func (c *Client) ReadGroup(dn string, memberPageSize int) (attributes map[string
 		0,
 		false,
 		"(objectclass=group)",
-		[]string{"name", "description"},
+		[]string{"name", "description", "groupType"},
 		[]ldap.Control{},
 	)
 
