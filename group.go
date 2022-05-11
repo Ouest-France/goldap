@@ -7,7 +7,7 @@ import (
 )
 
 // CreateGroup creates ldap group
-func (c *Client) CreateGroup(dn, name string, description string, members []string) error {
+func (c *Client) CreateGroup(dn, name, description, groupType string, members []string) error {
 
 	req := ldap.NewAddRequest(dn, []ldap.Control{})
 	req.Attribute("objectClass", []string{"group"})
@@ -15,6 +15,10 @@ func (c *Client) CreateGroup(dn, name string, description string, members []stri
 
 	if description != "" {
 		req.Attribute("description", []string{description})
+	}
+
+	if groupType != "" {
+		req.Attribute("groupType", []string{groupType})
 	}
 
 	if len(members) > 0 {
