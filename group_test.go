@@ -14,7 +14,7 @@ func TestCreateGroup(t *testing.T) {
 		t.FailNow()
 	}
 
-	err = client.CreateGroup(os.Getenv("GOLDAP_TESTGROUP"), os.Getenv("GOLDAP_TESTNAME"), os.Getenv("GOLDAP_TESTDESC"), []string{})
+	err = client.CreateGroup(os.Getenv("GOLDAP_TESTGROUP"), os.Getenv("GOLDAP_TESTNAME"), os.Getenv("GOLDAP_TESTDESC"), "", []string{})
 	if err != nil {
 		fmt.Printf("%s", err)
 		t.FailNow()
