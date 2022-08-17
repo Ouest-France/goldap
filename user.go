@@ -7,7 +7,7 @@ import (
 	"github.com/go-ldap/ldap/v3"
 )
 
-// ReadUser reads ldap user and return it's attributes on an error if the user donesn't exist
+// ReadUser reads ldap user and return it's attributes or an error if the user doesn't exist
 func (c *Client) ReadUser(ou string, name string, sAMAccountName string, upn string) (entries map[string][]string, err error) {
 	conditions := []string{"(objectCategory=person)", "(objectClass=user)"}
 
@@ -25,6 +25,11 @@ func (c *Client) ReadUser(ou string, name string, sAMAccountName string, upn str
 
 	filter := fmt.Sprintf("(&%s)", strings.Join(conditions, ""))
 
+	return c.ReadUserByFilter(ou, filter)
+}
+
+// ReadUserByFilter reads ldap user and return it's attributes or an error if the user doesn't exist
+func (c *Client) ReadUserByFilter(ou string, filter string) (entries map[string][]string, err error) {
 	req := ldap.NewSearchRequest(
 		ou,
 		ldap.ScopeWholeSubtree,
