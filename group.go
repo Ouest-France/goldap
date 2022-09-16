@@ -7,7 +7,7 @@ import (
 )
 
 // CreateGroup creates ldap group
-func (c *Client) CreateGroup(dn, name, description, groupType string, members []string) error {
+func (c *Client) CreateGroup(dn, name, description, groupType, managedBy string, members []string) error {
 
 	req := ldap.NewAddRequest(dn, []ldap.Control{})
 	req.Attribute("objectClass", []string{"group"})
@@ -19,6 +19,10 @@ func (c *Client) CreateGroup(dn, name, description, groupType string, members []
 
 	if groupType != "" {
 		req.Attribute("groupType", []string{groupType})
+	}
+
+	if managedBy != "" {
+		req.Attribute("managedBy", []string{managedBy})
 	}
 
 	if len(members) > 0 {
@@ -76,7 +80,7 @@ func (c *Client) ReadGroup(dn string, memberPageSize int) (attributes map[string
 		0,
 		false,
 		"(objectclass=group)",
-		[]string{"name", "description", "groupType"},
+		[]string{"name", "description", "groupType", "managedBy"},
 		[]ldap.Control{},
 	)
 
@@ -182,6 +186,20 @@ func (c *Client) UpdateGroupType(dn string, groupType string) error {
 	req := ldap.NewModifyRequest(dn, []ldap.Control{})
 
 	req.Replace("groupType", []string{groupType})
+
+	return c.Conn.Modify(req)
+}
+
+// UpdateGroupManagedBy updates ldap group managedBy
+func (c *Client) UpdateGroupManagedBy(dn string, managedBy string) error {
+
+	req := ldap.NewModifyRequest(dn, []ldap.Control{})
+
+	if managedBy == "" {
+		req.Delete("managedBy", []string{})
+	} else {
+		req.Replace("managedBy", []string{managedBy})
+	}
 
 	return c.Conn.Modify(req)
 }
