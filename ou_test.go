@@ -20,6 +20,22 @@ func TestCreateOrganizationalUnit(t *testing.T) {
 	}
 }
 
+func TestSearchOUByName(t *testing.T) {
+	client, err := NewClientHelper()
+	if err != nil {
+		fmt.Printf("%s", err)
+		t.FailNow()
+	}
+
+	dn, err := client.SearchOUByName(os.Getenv("GOLDAP_TESTOUNAME"), os.Getenv("GOLDAP_TESTBASEOU"), 2)
+	if err != nil {
+		fmt.Printf("%s", err)
+		t.FailNow()
+	}
+
+	t.Log(dn)
+}
+
 func TestReadOrganizationalUnit(t *testing.T) {
 
 	client, err := NewClientHelper()
