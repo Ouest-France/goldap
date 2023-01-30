@@ -30,7 +30,7 @@ func (c *Client) ReadOrganizationalUnit(dn string) (entries map[string][]string,
 
 	req := ldap.NewSearchRequest(
 		dn,
-		ldap.ScopeWholeSubtree,
+		ldap.ScopeBaseObject,
 		ldap.NeverDerefAliases,
 		0,
 		0,
