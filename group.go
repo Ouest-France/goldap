@@ -213,7 +213,11 @@ func (c *Client) UpdateGroupDisplayName(dn string, displayName string) error {
 
 	req := ldap.NewModifyRequest(dn, []ldap.Control{})
 
-	req.Replace("displayName", []string{displayName})
+	if displayName == "" {
+		req.Delete("displayName", []string{})
+	} else {
+		req.Replace("displayName", []string{displayName})
+	}
 
 	return c.Conn.Modify(req)
 }
